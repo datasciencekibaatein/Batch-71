@@ -99,3 +99,82 @@ FROM ORDERS O
 INNER JOIN CUSTOMERS C
 ON O.CUST_ID = C.CUST_ID
 GROUP BY C.CUST_NAME;
+
+
+-- --------------------------------------------------------
+CREATE TABLE departments (
+ dept_id INT PRIMARY KEY,
+ dept_name VARCHAR(50),
+ location VARCHAR(50)
+);
+CREATE TABLE employees (
+ emp_id INT PRIMARY KEY,
+ emp_name VARCHAR(50),
+ dept_id INT,
+ salary INT,
+ hire_date DATE,
+ manager_id INT,
+ FOREIGN KEY (dept_id) REFERENCES departments(dept_id)
+);
+CREATE TABLE customers (
+ customer_id INT PRIMARY KEY,
+ customer_name VARCHAR(50),
+ city VARCHAR(50),
+ signup_date DATE
+);
+CREATE TABLE orders (
+ order_id INT PRIMARY KEY,
+ customer_id INT,
+ order_date DATE,
+ order_amount INT,
+ FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+-- Insert Sample Data
+INSERT INTO departments VALUES
+(1, 'HR', 'Mumbai'),
+(2, 'IT', 'Bangalore'),
+(3, 'Finance', 'Delhi');
+INSERT INTO employees VALUES
+(101, 'Amit', 1, 40000, '2018-05-10', NULL),
+(102, 'Neha', 1, 35000, '2019-03-15', 101),
+(103, 'Raj', 2, 70000, '2017-07-01', NULL),
+(104, 'Sneha', 2, 65000, '2020-08-21', 103),
+(105, 'Karan', 3, 50000, '2016-01-11', NULL),
+(106, 'Pooja', 3, 45000, '2021-09-05', 105);
+INSERT INTO customers VALUES
+(1, 'Rohit', 'Mumbai', '2022-01-10'),
+(2, 'Anjali', 'Delhi', '2021-11-20'),
+(3, 'Suresh', 'Bangalore', '2023-02-15'),
+(4, 'Meena', 'Mumbai', '2022-06-18');
+INSERT INTO orders VALUES
+(201, 1, '2023-01-05', 12000),
+(202, 1, '2023-03-12', 18000),
+(203, 2, '2022-12-25', 22000),
+(204, 3, '2023-04-10', 8000);
+
+
+select 
+	dept.dept_name,
+	dept.dept_id,
+    avg(emp.salary) as dept_avg_salary
+from employees emp
+inner join departments dept
+on emp.dept_id = dept.dept_id
+group by dept.dept_id
+having avg(emp.salary) > (select avg(salary) from employees);
+
+
+
+-- ----------------------
+select 
+	emp_name,
+    dept_id,
+    salary,
+    hire_date
+    from employees emp
+    where salary <(
+select 
+	avg(salary)
+from employees
+where dept_id = emp.dept_id and hire_date <= date_sub(curdate(), interval 5 year));
+
