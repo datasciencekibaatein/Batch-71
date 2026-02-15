@@ -76,7 +76,9 @@ from orders;
 
 -- first values & last value
 select
-	*,
+	category,
+    orderdate,
+    sale,
     first_value(sale) over(partition by category order by orderdate ) firstSale,
     last_value(sale) over(partition by category order by orderdate
     rows between unbounded preceding and unbounded following) lastSale
